@@ -51,13 +51,23 @@ Vercel 提供了与 Neon Postgres 的免费集成，这是最推荐的方式。
    - 添加以下变量：
      ```bash
      DB_TYPE=postgres
-     DB_URL=${POSTGRES_URL}
      DB_SSL=true
      AUTH_TOKEN=your-secure-admin-token
      PROXY_TOKEN=your-secure-proxy-token
      ACCOUNT_CREDENTIAL_SECRET=your-secure-credential-secret
      ```
-   - 💡 提示：`DB_URL` 使用 `${POSTGRES_URL}` 引用 Vercel 自动创建的变量
+   - ⚠️ **重要**: 对于 `DB_URL`，有两种配置方式：
+   
+   **方式 1（推荐）**: 不设置 `DB_URL`，让 Vercel 自动使用 `POSTGRES_URL`
+   - Vercel 会自动将 Neon 的 `POSTGRES_URL` 注入到环境中
+   - 代码会自动使用 `POSTGRES_URL` 作为数据库连接
+   
+   **方式 2**: 手动复制连接字符串
+   - 在 Vercel Storage 页面找到 `POSTGRES_URL` 的值
+   - 复制完整的连接字符串（类似 `postgresql://user:pass@host/db`）
+   - 添加环境变量 `DB_URL`，粘贴连接字符串
+   
+   💡 提示：推荐使用方式 1，更简单且不容易出错
 
 4. **重新部署**
    - 进入 **Deployments** 标签

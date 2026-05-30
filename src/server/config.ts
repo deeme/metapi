@@ -65,6 +65,15 @@ function parseListenHost(env: NodeJS.ProcessEnv): string {
 
 export function buildConfig(env: NodeJS.ProcessEnv) {
   const dataDir = env.DATA_DIR || './data';
+  
+  // Auto-detect database URL from Vercel environment
+  let dbUrl = (env.DB_URL || '').trim();
+  const dbType = parseDbType(env.DB_TYPE);
+  
+  // If DB_URL is not set but we're using postgres, try POSTGRES_URL (Vercel Neon integration)
+  if (!dbUrl && dbType === 'postgres' && env.POSTGRES_URL) {
+    dbUrl = env.POSTGRES_URL.trim();
+  }
 
   return {
     authToken: env.AUTH_TOKEN || 'change-me-admin-token',
@@ -113,8 +122,8 @@ export function buildConfig(env: NodeJS.ProcessEnv) {
     port: Math.trunc(parseNumber(env.PORT, 4000)),
     listenHost: parseListenHost(env),
     dataDir,
-    dbType: parseDbType(env.DB_TYPE),
-    dbUrl: (env.DB_URL || '').trim(),
+    dbType,
+    dbUrl,
     dbSsl: parseBoolean(env.DB_SSL, false),
     requestBodyLimit: DEFAULT_REQUEST_BODY_LIMIT,
     routingFallbackUnitCost: Math.max(1e-6, parseNumber(env.ROUTING_FALLBACK_UNIT_COST, 1)),
