@@ -35,21 +35,21 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ### 第五步：配置定时任务（可选）
 
-#### 免费计划用户
+**详细配置指南**: 查看 [定时任务配置指南](VERCEL_CRON_GUIDE.md)
 
-使用 [cron-job.org](https://cron-job.org) 等免费服务：
+#### 快速配置（GitHub Actions）
 
-1. 注册账号
-2. 创建 3 个 Cron Job：
-   - 签到：`0 8 * * *` → `POST https://your-domain.vercel.app/api/cron/checkin`
-   - 余额刷新：`0 * * * *` → `POST https://your-domain.vercel.app/api/cron/balance-refresh`
-   - 日志清理：`0 6 * * *` → `POST https://your-domain.vercel.app/api/cron/log-cleanup`
-3. 添加 Header: `Authorization: Bearer YOUR_AUTH_TOKEN`
+1. 在仓库中创建 `.github/workflows/vercel-cron.yml`
+2. 复制 `.github/workflows/vercel-cron.yml.example` 的内容
+3. 在 GitHub 仓库设置中添加 Secrets：
+   - `VERCEL_DOMAIN`: 你的域名
+   - `AUTH_TOKEN`: 你的令牌
 
-#### Pro 计划用户
+#### 其他方案
 
-1. 将 `vercel.pro.json` 重命名为 `vercel.json`
-2. 重新部署，Vercel 会自动执行定时任务
+- 使用 [cron-job.org](https://cron-job.org) - 简单易用
+- 使用 [EasyCron](https://www.easycron.com) - 免费计划可用
+- 升级到 Vercel Pro - 内置 Cron Jobs 支持
 
 ### 第六步：访问应用
 部署完成后，点击 **Visit** 按钮访问你的 Metapi 实例！
