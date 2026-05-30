@@ -1,0 +1,64 @@
+# Development files
+node_modules
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist/desktop
+build
+tmp
+
+# Test files
+*.test.ts
+*.test.js
+**/__tests__
+**/__mocks__
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Electron
+electron-builder.yml
+src/desktop
+
+# Scripts
+scripts/dev
+scripts/desktop
+
+# Data
+data
+*.db
+*.db-shm
+*.db-wal
+
+# Docker
+docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Other deployment configs
+render.yaml
+zeabur-template.yaml
+deploy
+
+# Logs
+*.log
+logs
