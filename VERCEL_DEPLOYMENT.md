@@ -409,10 +409,39 @@ vercel logs [deployment-url]
 
 ### 1. 数据库连接失败
 
-检查：
-- 数据库 URL 是否正确
-- 数据库是否允许来自 Vercel 的连接
-- SSL 配置是否正确
+**错误**: `getaddrinfo ENOTFOUND base` 或 `ENOTFOUND`
+
+**原因**: 数据库连接字符串配置错误。
+
+**解决方案**：
+
+1. **检查环境变量配置**
+   - 进入 Vercel 项目的 **Settings** → **Environment Variables**
+   - 检查是否有 `DB_URL` 变量
+   - 如果有 `DB_URL` 且值为 `${POSTGRES_URL}` 或其他占位符，**删除它**
+   - Vercel 不会解析 `${...}` 语法，这会导致连接失败
+
+2. **正确的配置方式**
+   - 只设置以下变量：
+     ```
+     DB_TYPE=postgres
+     DB_SSL=true
+     ```
+   - **不要设置 `DB_URL`**，代码会自动使用 `POSTGRES_URL`
+
+3. **验证 Neon 数据库**
+   - 进入 **Storage** 标签
+   - 确认 Neon Postgres 数据库已创建
+   - 确认可以看到 `POSTGRES_URL` 等环境变量
+
+4. **重新部署**
+   - 删除或修正 `DB_URL` 后
+   - 进入 **Deployments** 标签
+   - 点击 **Redeploy**
+
+**其他检查**：
+- 数据库是否允许来自 Vercel 的连接（Neon 默认允许）
+- SSL 配置是否正确（应设置 `DB_SSL=true`）
 
 ### 2. 环境变量未生效
 

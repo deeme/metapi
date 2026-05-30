@@ -79,6 +79,16 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 查看完整的部署指南：[VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
 
+## 🐛 遇到问题？
+
+查看故障排查指南：[VERCEL_TROUBLESHOOTING.md](VERCEL_TROUBLESHOOTING.md)
+
+常见问题：
+- 数据库连接失败 (`ENOTFOUND base`)
+- 构建错误
+- 定时任务配置
+- 函数超时
+
 ---
 
 ## 🆘 常见问题
