@@ -127,6 +127,32 @@ curl -X POST https://your-domain.vercel.app/api/cron/log-cleanup \
 3. 查看 Vercel 日志中的错误信息
 
 ### 问题：数据库连接失败
+
+**错误 1**: `ENOTFOUND base` 或 `getaddrinfo ENOTFOUND`
+
+**原因**: 数据库连接字符串配置错误或未正确解析。
+
+**解决方案**：
+1. **推荐方式**：不设置 `DB_URL`，只设置 `DB_TYPE=postgres`
+   - Vercel 会自动使用 Neon 的 `POSTGRES_URL`
+   - 代码会自动检测并使用它
+2. **手动方式**：如果需要手动设置
+   - 在 Vercel Storage 页面找到 `POSTGRES_URL` 的值
+   - 复制完整的连接字符串（不要使用 `${POSTGRES_URL}` 语法）
+   - 添加环境变量 `DB_URL`，粘贴连接字符串
+3. 确认 `DB_SSL=true`
+4. 重新部署项目
+
+**错误 2**: `ENOENT: no such file or directory, mkdir '/var/task/data'`
+
+**原因**: 代码尝试使用 SQLite 数据库，但 Vercel 文件系统是只读的。
+
+**解决方案**：
+1. 确保设置了 `DB_TYPE=postgres`
+2. 确保已添加 Neon Postgres 数据库
+3. 重新部署项目
+
+### 问题：数据库连接失败（旧版本）
 **解决方案**：
 1. 确认 `DB_URL` 正确引用了 `${POSTGRES_URL}`
 2. 确认 `DB_SSL=true`

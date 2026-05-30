@@ -17,12 +17,13 @@
 
 ```bash
 DB_TYPE=postgres
-DB_URL=${POSTGRES_URL}
 DB_SSL=true
 AUTH_TOKEN=your-secure-admin-token
 PROXY_TOKEN=your-secure-proxy-token
 ACCOUNT_CREDENTIAL_SECRET=your-secure-credential-secret
 ```
+
+⚠️ **重要**: 不需要设置 `DB_URL`！Vercel 会自动使用 Neon 的 `POSTGRES_URL`。
 
 💡 生成安全令牌：
 ```bash
