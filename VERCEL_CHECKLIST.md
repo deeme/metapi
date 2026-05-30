@@ -93,6 +93,15 @@ curl -X POST https://your-domain.vercel.app/api/cron/log-cleanup \
 
 ## 🐛 常见问题排查
 
+### 问题：构建失败 - Cannot find module 'scripts/desktop/generate-icons.mjs'
+
+**原因**: 使用了旧版本的代码，构建脚本包含了桌面应用的图标生成步骤。
+
+**解决方案**：
+1. 拉取最新代码：`git pull origin main`
+2. 确保 `package.json` 中有 `build:web:vercel` 脚本
+3. 在 Vercel 中重新部署
+
 ### 问题：无法访问部署的 URL
 **解决方案**：
 1. 检查 Vercel 部署状态是否为 "Ready"

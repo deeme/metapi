@@ -7,7 +7,8 @@
 ## 前置要求
 
 1. 一个 [Vercel](https://vercel.com) 账号（免费）
-2. 一个外部数据库（推荐使用 Neon Postgres 免费计划）
+2. Node.js >= 24.x（Vercel 会自动使用）
+3. 一个外部数据库（推荐使用 Neon Postgres 免费计划）
    - Vercel 不支持持久化的 SQLite 数据库
    - 推荐使用：
      - **[Neon](https://neon.tech/)** (PostgreSQL) - ⭐ 推荐，免费计划 0.5GB 存储
@@ -411,9 +412,19 @@ vercel logs [deployment-url]
 ### 3. 构建失败
 
 检查：
-- Node.js 版本是否兼容（需要 >= 25.0.0）
+- Node.js 版本是否兼容（需要 >= 24.x）
 - 依赖是否正确安装
 - 构建日志中的错误信息
+
+**常见构建错误**：
+
+**错误 1**: `Cannot find module 'scripts/desktop/generate-icons.mjs'`
+- **原因**: 旧版本的构建脚本包含了桌面应用的图标生成
+- **解决**: 确保使用最新版本的代码，`vercel-build` 脚本已修复此问题
+
+**错误 2**: TypeScript 编译错误
+- **原因**: 依赖版本不匹配或类型定义缺失
+- **解决**: 运行 `npm install` 确保所有依赖正确安装
 
 ### 4. 函数超时
 
