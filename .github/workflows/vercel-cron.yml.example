@@ -1,0 +1,66 @@
+# GitHub Actions 定时任务配置示例
+# 
+# 如果你不想使用外部 Cron 服务，可以使用 GitHub Actions 来触发定时任务
+# 
+# 使用方法：
+# 1. 在你的 GitHub 仓库中创建 .github/workflows/cron.yml
+# 2. 复制以下内容到该文件
+# 3. 在仓库的 Settings → Secrets and variables → Actions 中添加以下 secrets：
+#    - VERCEL_DOMAIN: 你的 Vercel 部署域名（例如：your-app.vercel.app）
+#    - AUTH_TOKEN: 你的 AUTH_TOKEN
+# 4. 提交并推送到 GitHub
+
+name: Metapi Cron Jobs
+
+on:
+  schedule:
+    # 签到任务 - 每天 8:00 UTC (北京时间 16:00)
+    - cron: '0 8 * * *'
+    # 余额刷新 - 每小时
+    - cron: '0 * * * *'
+    # 日志清理 - 每天 6:00 UTC (北京时间 14:00)
+    - cron: '0 6 * * *'
+  
+  # 允许手动触发
+  workflow_dispatch:
+    inputs:
+      task:
+        description: '选择要执行的任务'
+        required: true
+        type: choice
+        options:
+          - all
+          - checkin
+          - balance-refresh
+          - log-cleanup
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 8 * * *' || github.event.inputs.task == 'all' || github.event.inputs.task == 'checkin'
+    steps:
+      - name: 执行签到任务
+        run: |
+          curl -X POST https://${{ secrets.VERCEL_DOMAIN }}/api/cron/checkin \
+            -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" \
+            -f || exit 1
+
+  balance-refresh:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *' || github.event.inputs.task == 'all' || github.event.inputs.task == 'balance-refresh'
+    steps:
+      - name: 执行余额刷新任务
+        run: |
+          curl -X POST https://${{ secrets.VERCEL_DOMAIN }}/api/cron/balance-refresh \
+            -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" \
+            -f || exit 1
+
+  log-cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 6 * * *' || github.event.inputs.task == 'all' || github.event.inputs.task == 'log-cleanup'
+    steps:
+      - name: 执行日志清理任务
+        run: |
+          curl -X POST https://${{ secrets.VERCEL_DOMAIN }}/api/cron/log-cleanup \
+            -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" \
+            -f || exit 1

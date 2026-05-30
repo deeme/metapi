@@ -207,15 +207,65 @@ vercel --prod
 
 ### 4. 配置定时任务
 
-Vercel 支持通过 Cron Jobs 运行定时任务。项目已在 `vercel.json` 中配置了以下定时任务：
+#### 免费计划（Hobby）
 
-- **签到任务**: 每天 8:00 执行 (`/api/cron/checkin`)
-- **余额刷新**: 每小时执行 (`/api/cron/balance-refresh`)
-- **日志清理**: 每天 6:00 执行 (`/api/cron/log-cleanup`)
+Vercel 免费计划**不支持 Cron Jobs**，你需要使用外部服务来定期调用定时任务端点。
 
-这些定时任务需要在 Vercel 项目设置中启用 Cron Jobs 功能（Pro 计划及以上）。
+**推荐的免费 Cron 服务**：
 
-如果你使用的是免费计划，可以使用外部服务（如 [cron-job.org](https://cron-job.org)）定期调用这些端点：
+1. **[cron-job.org](https://cron-job.org)** - 免费，支持每分钟执行
+2. **[EasyCron](https://www.easycron.com)** - 免费计划支持每小时执行
+3. **[GitHub Actions](https://github.com/features/actions)** - 使用 workflow 定时触发（推荐）
+4. **[Uptime Robot](https://uptimerobot.com)** - 监控服务，可用于定时请求
+
+**方案 1: 使用 cron-job.org**
+
+1. 注册 [cron-job.org](https://cron-job.org) 账号
+2. 创建新的 Cron Job
+3. 配置以下任务：
+
+**签到任务**（每天 8:00）：
+```
+URL: https://your-domain.vercel.app/api/cron/checkin
+Method: POST
+Headers: Authorization: Bearer YOUR_AUTH_TOKEN
+Schedule: 0 8 * * *
+```
+
+**余额刷新**（每小时）：
+```
+URL: https://your-domain.vercel.app/api/cron/balance-refresh
+Method: POST
+Headers: Authorization: Bearer YOUR_AUTH_TOKEN
+Schedule: 0 * * * *
+```
+
+**日志清理**（每天 6:00）：
+```
+URL: https://your-domain.vercel.app/api/cron/log-cleanup
+Method: POST
+Headers: Authorization: Bearer YOUR_AUTH_TOKEN
+Schedule: 0 6 * * *
+```
+
+**方案 2: 使用 GitHub Actions（推荐）**
+
+如果你的项目托管在 GitHub 上，可以使用 GitHub Actions 免费执行定时任务。
+
+1. 在仓库中创建 `.github/workflows/vercel-cron.yml`
+2. 复制 `.github/workflows/vercel-cron.yml.example` 的内容
+3. 在仓库的 **Settings** → **Secrets and variables** → **Actions** 中添加：
+   - `VERCEL_DOMAIN`: 你的 Vercel 域名（例如：`your-app.vercel.app`）
+   - `AUTH_TOKEN`: 你的 AUTH_TOKEN
+4. 提交并推送，GitHub Actions 会自动执行定时任务
+
+**优势**：
+- ✅ 完全免费
+- ✅ 可靠稳定
+- ✅ 支持手动触发
+- ✅ 有执行日志
+
+**使用 curl 手动测试**：
 
 ```bash
 # 签到任务
@@ -230,6 +280,17 @@ curl -X POST https://your-domain.vercel.app/api/cron/balance-refresh \
 curl -X POST https://your-domain.vercel.app/api/cron/log-cleanup \
   -H "Authorization: Bearer YOUR_AUTH_TOKEN"
 ```
+
+#### Pro 计划
+
+如果你有 Vercel Pro 计划，可以使用内置的 Cron Jobs 功能：
+
+1. 将 `vercel.pro.json` 重命名为 `vercel.json`
+2. 重新部署项目
+3. Vercel 会自动执行配置的定时任务：
+   - **签到任务**: 每天 8:00 执行
+   - **余额刷新**: 每小时执行
+   - **日志清理**: 每天 6:00 执行
 
 ### 5. 数据库迁移
 

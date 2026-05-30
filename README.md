@@ -301,7 +301,7 @@
 **注意事项**：
 - ✅ 可使用 Vercel + Neon Postgres 完全免费部署
 - ❌ WebSocket 功能不可用
-- ⚠️ 定时任务需要 Pro 计划或使用外部 Cron 服务
+- ❌ 免费计划不支持内置定时任务（需使用 [cron-job.org](https://cron-job.org) 等外部服务）
 - 查看完整的 [功能限制说明](VERCEL_DEPLOYMENT.md#功能限制)
 
 ### Docker Compose（推荐）

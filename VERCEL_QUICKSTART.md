@@ -33,7 +33,25 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 1. 进入 **Deployments** 标签
 2. 点击最新部署的三个点 → **Redeploy**
 
-### 第五步：访问应用
+### 第五步：配置定时任务（可选）
+
+#### 免费计划用户
+
+使用 [cron-job.org](https://cron-job.org) 等免费服务：
+
+1. 注册账号
+2. 创建 3 个 Cron Job：
+   - 签到：`0 8 * * *` → `POST https://your-domain.vercel.app/api/cron/checkin`
+   - 余额刷新：`0 * * * *` → `POST https://your-domain.vercel.app/api/cron/balance-refresh`
+   - 日志清理：`0 6 * * *` → `POST https://your-domain.vercel.app/api/cron/log-cleanup`
+3. 添加 Header: `Authorization: Bearer YOUR_AUTH_TOKEN`
+
+#### Pro 计划用户
+
+1. 将 `vercel.pro.json` 重命名为 `vercel.json`
+2. 重新部署，Vercel 会自动执行定时任务
+
+### 第六步：访问应用
 部署完成后，点击 **Visit** 按钮访问你的 Metapi 实例！
 
 ---
@@ -49,8 +67,12 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 由于 Vercel Serverless 环境限制：
 
 - ❌ WebSocket 不支持
-- ⚠️ 定时任务需要 Pro 计划（或使用外部 Cron 服务）
+- ❌ 免费计划不支持内置 Cron Jobs（需使用外部服务）
 - ⚠️ 函数执行时间限制（免费 10 秒，Pro 60 秒）
+
+**定时任务解决方案**：
+- 免费计划：使用 [cron-job.org](https://cron-job.org) 等外部服务
+- Pro 计划：使用 `vercel.pro.json` 配置内置 Cron Jobs
 
 ## 📚 详细文档
 
