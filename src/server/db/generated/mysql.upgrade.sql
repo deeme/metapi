@@ -1,1 +1,1 @@
--- no schema changes detected for mysql
+ALTER TABLE `sites` ADD COLUMN `auto_refresh` BOOLEAN NOT NULL DEFAULT true;

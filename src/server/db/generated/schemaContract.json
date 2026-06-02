@@ -2113,6 +2113,12 @@
           "notNull": false,
           "defaultValue": "0",
           "primaryKey": false
+        },
+        "auto_refresh": {
+          "logicalType": "boolean",
+          "notNull": true,
+          "defaultValue": "true",
+          "primaryKey": false
         }
       }
     },
