@@ -17,6 +17,7 @@
     }
   ],
   "routes": [
+    { "handle": "filesystem" },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
@@ -27,7 +28,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.ts"
+      "dest": "/index.html"
     }
   ],
   "env": {

@@ -34,8 +34,7 @@ import { ensureOauthProviderSitesExist } from '../src/server/services/oauth/oaut
 import { ensureRuntimeDatabaseReady } from '../src/server/runtimeDatabaseBootstrap.js';
 import { isPublicApiRoute, registerDesktopRoutes } from '../src/server/desktop.js';
 import { existsSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, normalize, resolve, sep } from 'path';
+import { normalize, resolve, sep } from 'path';
 import {
   applyRuntimeSettings,
   parseSettingFromMap,
@@ -211,8 +210,10 @@ async function createApp() {
   await app.register(proxyRoutes);
 
   // Serve static web frontend in production
-  const webDir = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/web');
-  if (existsSync(webDir)) {
+  const webDir = process.env.VERCEL
+    ? null
+    : resolve(process.cwd(), 'dist/web');
+  if (webDir && existsSync(webDir)) {
     await app.register(fastifyStatic, {
       root: webDir,
       prefix: '/',
