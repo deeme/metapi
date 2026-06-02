@@ -500,7 +500,9 @@ async function activatePersistedOauthAccount(input: {
   if (shouldRefreshModels) {
     const refreshResult = await refreshModelsForAccount(
       persisted.account.id,
-      persisted.previousAccount ? { allowInactive: true } : undefined,
+      persisted.previousAccount
+        ? { allowInactive: true, bypassAutoRefreshCheck: true }
+        : { bypassAutoRefreshCheck: true },
     );
     if (refreshResult.status !== 'success') {
       await revertPersistedOauthAccount({
@@ -1130,7 +1132,7 @@ export async function updateOauthConnectionProxySettings(input: {
     updatedAt,
   }).where(eq(schema.accounts.id, input.accountId)).run();
 
-  const refreshResult = await refreshModelsForAccount(input.accountId, { allowInactive: true });
+  const refreshResult = await refreshModelsForAccount(input.accountId, { allowInactive: true, bypassAutoRefreshCheck: true });
   await routeRefreshWorkflow.rebuildRoutesOnly();
 
   return {

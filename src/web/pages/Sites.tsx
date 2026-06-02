@@ -73,6 +73,7 @@ type SiteRow = {
   postRefreshProbeModel?: string | null;
   postRefreshProbeScope?: string | null;
   postRefreshProbeLatencyThresholdMs?: number | null;
+  autoRefresh?: boolean;
   apiEndpoints?: Array<{
     id?: number;
     url: string;
@@ -316,6 +317,7 @@ export default function Sites() {
   const [disabledModelsLoading, setDisabledModelsLoading] = useState(false);
   const [disabledModelsSaving, setDisabledModelsSaving] = useState(false);
   const [probeEnabled, setProbeEnabled] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
   const [probeModel, setProbeModel] = useState('');
   const [probeScope, setProbeScope] = useState<'single' | 'all'>('single');
   const [probeSaving, setProbeSaving] = useState(false);
@@ -518,6 +520,7 @@ export default function Sites() {
     setAvailableModels([]);
     setDisabledModelSearch('');
     setProbeEnabled(!!site.postRefreshProbeEnabled);
+    setAutoRefresh(site.autoRefresh !== false);
     setProbeModel(typeof site.postRefreshProbeModel === 'string' ? site.postRefreshProbeModel : '');
     setProbeScope(site.postRefreshProbeScope === 'all' ? 'all' : 'single');
     setProbeLatencyThreshold(String(site.postRefreshProbeLatencyThresholdMs ?? 0));
@@ -772,6 +775,7 @@ export default function Sites() {
       postRefreshProbeModel: probeModel.trim(),
       postRefreshProbeScope: probeScope,
       postRefreshProbeLatencyThresholdMs: Math.max(0, parseInt(probeLatencyThreshold, 10) || 0),
+      autoRefresh,
     };
     if (!payload.name || !payload.url) {
       toast.error('请填写站点名称和 URL');
@@ -1889,6 +1893,21 @@ export default function Sites() {
                   </div>
                 </div>
               )}
+
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px dashed var(--color-border)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>自动刷新模型</div>
+                <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 10 }}>
+                  关闭后，该站点下所有账号不会被定时自动获取模型（仅在手动刷新时获取），可避免上游 API 异常时频繁触发健康检查导致误报。
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={autoRefresh}
+                    onChange={(e) => setAutoRefresh(e.target.checked)}
+                  />
+                  <span>{autoRefresh ? '已启用' : '已关闭'}</span>
+                </label>
+              </div>
             </div>
           )}
 

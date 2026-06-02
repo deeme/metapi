@@ -696,6 +696,12 @@ export async function sitesRoutes(app: FastifyInstance) {
       const ms = Number(anyBody.postRefreshProbeLatencyThresholdMs);
       updates.postRefreshProbeLatencyThresholdMs = Number.isFinite(ms) && ms >= 0 ? Math.trunc(ms) : 0;
     }
+    if (anyBody.autoRefresh !== undefined) {
+      if (typeof anyBody.autoRefresh !== 'boolean') {
+        return reply.code(400).send({ error: 'autoRefresh must be a boolean' });
+      }
+      updates.autoRefresh = anyBody.autoRefresh;
+    }
     updates.updatedAt = new Date().toISOString();
     try {
       await db.transaction(async (tx) => {

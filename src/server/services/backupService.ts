@@ -762,6 +762,7 @@ function buildAllApiHubV2AccountsSection(data: RawBackupData): {
       postRefreshProbeModel: '',
       postRefreshProbeScope: 'single',
       postRefreshProbeLatencyThresholdMs: 0,
+      autoRefresh: true,
       createdAt: input.createdAt,
       updatedAt: input.updatedAt,
     });
@@ -1009,6 +1010,7 @@ function buildAccountsSectionFromRefBackup(data: RawBackupData): AccountsBackupS
         postRefreshProbeModel: '',
         postRefreshProbeScope: 'single',
         postRefreshProbeLatencyThresholdMs: 0,
+        autoRefresh: true,
         createdAt: toIsoString(item.created_at),
         updatedAt: toIsoString(item.updated_at),
       });
@@ -1558,6 +1560,7 @@ async function importAccountsSection(section: AccountsBackupSection): Promise<vo
         postRefreshProbeModel: row.postRefreshProbeModel ?? '',
         postRefreshProbeScope: (row.postRefreshProbeScope === 'all' ? 'all' : 'single') as 'single' | 'all',
         postRefreshProbeLatencyThresholdMs: row.postRefreshProbeLatencyThresholdMs ?? 0,
+        autoRefresh: row.autoRefresh !== false,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       }).run();

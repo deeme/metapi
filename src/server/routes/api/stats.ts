@@ -1839,7 +1839,7 @@ export async function statsRoutes(app: FastifyInstance) {
         return { success: false, error: "Invalid account id" };
       }
 
-      const refresh = await refreshModelsForAccount(accountId);
+      const refresh = await refreshModelsForAccount(accountId, { bypassAutoRefreshCheck: true });
       const rebuild = await routeRefreshWorkflow.rebuildRoutesOnly();
       return { success: true, refresh, rebuild };
     },

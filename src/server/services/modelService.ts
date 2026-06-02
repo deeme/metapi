@@ -54,7 +54,7 @@ let inFlightRefreshModelsAndRebuildRoutes: Promise<{
 }> | null = null;
 
 type ModelRefreshErrorCode = 'timeout' | 'unauthorized' | 'empty_models' | 'unknown';
-type ModelRefreshSkipCode = 'site_disabled' | 'adapter_or_status';
+type ModelRefreshSkipCode = 'site_disabled' | 'site_auto_refresh_disabled' | 'adapter_or_status';
 
 export type ModelRefreshAccountNotFoundResult = {
   accountId: number;
@@ -194,6 +194,10 @@ function buildModelFailureMessage(code: ModelRefreshErrorCode, fallback?: string
 
 function isSiteDisabled(status?: string | null): boolean {
   return (status || 'active') === 'disabled';
+}
+
+function isSiteAutoRefreshDisabled(autoRefresh?: boolean | null): boolean {
+  return autoRefresh === false;
 }
 
 function normalizeModels(models: string[]): string[] {
@@ -602,7 +606,7 @@ async function runPostRefreshProbeIfEnabled(params: {
 
 export async function refreshModelsForAccount(
   accountId: number,
-  options?: { allowInactive?: boolean },
+  options?: { allowInactive?: boolean; bypassAutoRefreshCheck?: boolean },
 ): Promise<ModelRefreshResult> {
   const row = await db.select().from(schema.accounts)
     .innerJoin(schema.sites, eq(schema.accounts.siteId, schema.sites.id))
@@ -693,6 +697,10 @@ export async function refreshModelsForAccount(
 
   if (isSiteDisabled(site.status)) {
     return buildSkippedRefreshResult(accountId, 'site_disabled', '站点已禁用');
+  }
+
+  if (!options?.bypassAutoRefreshCheck && isSiteAutoRefreshDisabled(site.autoRefresh)) {
+    return buildSkippedRefreshResult(accountId, 'site_auto_refresh_disabled', '站点已关闭自动刷新模型');
   }
 
   if (account.status !== 'active' && !options?.allowInactive) {
