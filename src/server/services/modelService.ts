@@ -623,6 +623,14 @@ export async function refreshModelsForAccount(
   const adapter = getAdapter(site.platform);
   const accountProxyUrl = resolveProxyUrlFromExtraConfig(account.extraConfig);
 
+  if (isSiteDisabled(site.status)) {
+    return buildSkippedRefreshResult(accountId, 'site_disabled', '站点已禁用');
+  }
+
+  if (!options?.bypassAutoRefreshCheck && isSiteAutoRefreshDisabled(site.autoRefresh)) {
+    return buildSkippedRefreshResult(accountId, 'site_auto_refresh_disabled', '站点已关闭自动刷新模型');
+  }
+
   const restoreAvailabilityOnFailure = options?.allowInactive === true;
   const previousAccountTokens = restoreAvailabilityOnFailure
     ? await db.select()
@@ -694,14 +702,6 @@ export async function refreshModelsForAccount(
       .all()
     ).map((r) => r.modelName.toLowerCase()),
   );
-
-  if (isSiteDisabled(site.status)) {
-    return buildSkippedRefreshResult(accountId, 'site_disabled', '站点已禁用');
-  }
-
-  if (!options?.bypassAutoRefreshCheck && isSiteAutoRefreshDisabled(site.autoRefresh)) {
-    return buildSkippedRefreshResult(accountId, 'site_auto_refresh_disabled', '站点已关闭自动刷新模型');
-  }
 
   if (account.status !== 'active' && !options?.allowInactive) {
     return buildSkippedRefreshResult(accountId, 'adapter_or_status', '平台不可用或账号未激活');

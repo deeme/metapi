@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { eq } from 'drizzle-orm';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -112,5 +113,65 @@ describe('refreshModelsForAccount with site.autoRefresh=false', () => {
     if (result.status === 'skipped') {
       expect(result.reason).not.toBe('site_auto_refresh_disabled');
     }
+  });
+
+  it('preserves existing model rows when site.autoRefresh=false (regression: clear was running before guard)', async () => {
+    const site = await db.insert(schema.sites).values({
+      name: 'preserve-models-site',
+      url: 'https://preserve.example.com',
+      platform: 'new-api',
+      autoRefresh: false,
+    }).returning().get();
+
+    const account = await db.insert(schema.accounts).values({
+      siteId: site.id,
+      username: 'user-preserve',
+      accessToken: '',
+      apiToken: 'sk-preserve',
+      status: 'active',
+      extraConfig: JSON.stringify({ credentialMode: 'apikey' }),
+    }).returning().get();
+
+    const token = await db.insert(schema.accountTokens).values({
+      accountId: account.id,
+      name: 'token-1',
+      token: 'sk-token-1',
+      source: 'manual',
+      enabled: true,
+      isDefault: true,
+      valueStatus: 'ready',
+    }).returning().get();
+
+    await db.insert(schema.modelAvailability).values({
+      accountId: account.id,
+      modelName: 'gpt-4',
+      available: true,
+      latencyMs: 120,
+      isManual: false,
+    }).run();
+
+    await db.insert(schema.tokenModelAvailability).values({
+      tokenId: token.id,
+      modelName: 'gpt-4',
+      available: true,
+      latencyMs: 120,
+    }).run();
+
+    const result = await refreshModelsForAccount(account.id);
+
+    expect(result.status).toBe('skipped');
+    if (result.status === 'skipped') {
+      expect(result.reason).toBe('site_auto_refresh_disabled');
+    }
+
+    const remainingAccountModels = await db.select().from(schema.modelAvailability)
+      .where(eq(schema.modelAvailability.accountId, account.id))
+      .all();
+    const remainingTokenModels = await db.select().from(schema.tokenModelAvailability)
+      .where(eq(schema.tokenModelAvailability.tokenId, token.id))
+      .all();
+
+    expect(remainingAccountModels.map((row: { modelName: string }) => row.modelName)).toEqual(['gpt-4']);
+    expect(remainingTokenModels.map((row: { modelName: string }) => row.modelName)).toEqual(['gpt-4']);
   });
 });
